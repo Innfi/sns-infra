@@ -106,3 +106,18 @@ resource "aws_security_group" "public" {
         var.vpc_tags,
     )
 }
+
+#s3
+
+resource "aws_s3_bucket" "sns-v1" {
+    bucket = "sns-v1"
+    acl = "private"
+
+    tags = merge(
+        {
+            "Name" = format("%s-public", var.name)
+        },
+        var.tags, 
+        var.vpc_tags,
+    )
+}
