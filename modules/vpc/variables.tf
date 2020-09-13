@@ -50,6 +50,18 @@ variable "port_db" {
   default = 3306
 }
 
+variable "ec2_ami_web" {
+  description = "aws ami id"
+  type = string
+  default = "ami-064c81ce3a290fde1"
+}
+
+variable "ec2_type_web" {
+  description = "ec2 instance type for web instances"
+  type = string 
+  default = "t2.micro"
+}
+
 variable "vpc_tags" {
   description = "Additional tags for the VPC"
   type        = map(string)
