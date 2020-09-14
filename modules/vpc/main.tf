@@ -83,14 +83,6 @@ resource "aws_route_table_association" "public" {
 resource "aws_security_group" "public" {
     vpc_id = local.vpc_id
 
-    ingress {
-        description = "http"
-        from_port = var.port_http
-        to_port = var.port_http
-        protocol = "tcp" 
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
     egress {
         from_port = 0
         to_port = 0
@@ -105,6 +97,24 @@ resource "aws_security_group" "public" {
         var.tags, 
         var.vpc_tags,
     )
+}
+
+resource "aws_security_group_rule" "public_http" {
+    security_group_id = aws_security_group.public.id
+    type = "ingress" 
+    from_port = var.port_http
+    to_port = var.port_http
+    protocol = "tcp" 
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "public_ssh" {
+    security_group_id = aws_security_group.public.id
+    type = "ingress" 
+    from_port = var.port_ssh
+    to_port = var.port_ssh
+    protocol = "tcp" 
+    cidr_blocks = ["0.0.0.0/0"]
 }
 
 #s3
@@ -168,7 +178,6 @@ resource "aws_iam_instance_profile" "ec2_deploy_profile" {
     name = "deploy_profile"
     role = aws_iam_role.ec2_deploy_role.name
 }
-
 
 #ec2 web
 resource "aws_instance" "web" {

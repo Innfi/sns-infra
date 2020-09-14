@@ -50,10 +50,16 @@ variable "port_db" {
   default = 3306
 }
 
+variable "port_ssh" {
+  description = "port number for ssh" 
+  type = number 
+  default = 22
+}
+
 variable "ec2_ami_web" {
   description = "aws ami id"
   type = string
-  default = "ami-064c81ce3a290fde1"
+  default = "ami-08f35ff5d5c07e955"
 }
 
 variable "ec2_type_web" {
