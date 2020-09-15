@@ -19,7 +19,25 @@ resource "aws_iam_role" "codedeploy_role" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "aws-codedeploy-role" {
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+    role = aws_iam_role.codedeploy_role.name
+}
 
+#s3
+
+resource "aws_s3_bucket" "sns-v1" {
+    bucket = "sns-v1"
+    acl = "private"
+
+    tags = merge(
+        {
+            "Name" = format("%s-public", var.name)
+        },
+        var.tags, 
+        var.vpc_tags,
+    )
+}
 
 # codedeploy app
 resource "aws_codedeploy_app" "sns-v1-deploy" {

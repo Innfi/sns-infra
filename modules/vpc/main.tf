@@ -117,21 +117,6 @@ resource "aws_security_group_rule" "public_ssh" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
-#s3
-
-resource "aws_s3_bucket" "sns-v1" {
-    bucket = "sns-v1"
-    acl = "private"
-
-    tags = merge(
-        {
-            "Name" = format("%s-public", var.name)
-        },
-        var.tags, 
-        var.vpc_tags,
-    )
-}
-
 #service role
 resource "aws_iam_role" "ec2_deploy_role" {
     name = "ec2_deploy_role"
