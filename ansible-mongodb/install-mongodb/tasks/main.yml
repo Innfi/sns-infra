@@ -1,0 +1,23 @@
+--- 
+# tasks file for install-mongodb
+
+- name: cleanup default 
+  apt: 
+    name: mongodb
+    state: absent
+
+- name: install mongodb 
+  apt:
+    name: mongodb
+
+- name: create data directory
+  file:
+    path: /data/db
+    state: directory 
+    owner: '{{ username }}'
+    group: '{{ username }}'
+
+- name: start mongod service 
+  system: 
+    name: mongod
+    state: started
