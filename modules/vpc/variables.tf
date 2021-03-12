@@ -21,6 +21,11 @@ variable "subnet_public" {
   type = list
 }
 
+variable "subnet_private" {
+  description = "private subnet cidrs"
+  type = list
+}
+
 variable "key_pair" {
   description = "ec2 key pair"
   type = string
@@ -66,6 +71,12 @@ variable "ec2_type_web" {
   description = "ec2 instance type for web instances"
   type = string 
   default = "t2.micro"
+}
+
+variable "internal_cidrs" {
+  description = "allowed cidrs to connect"
+  type = list(string)
+  default = ["0.0.0.0/0"]
 }
 
 variable "vpc_tags" {

@@ -28,6 +28,14 @@ variable "vpc_public_subnets" {
     ]
 }
 
+variable "vpc_private_subnets" {
+    description = "Private Subnets" 
+    type = list(string)
+    default = [
+        "10.0.3.0/24"
+    ]
+}
+
 variable "key_pair" {
     description = "ec2 key pair"
     type = string
@@ -37,7 +45,7 @@ variable "key_pair" {
 variable "port_http" {
   description = "port number for web(http) instances"
   type = number 
-  default = 80
+  default = 1330
 }
 
 variable "port_was" {

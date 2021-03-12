@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "gateway" {
     )
 }
 
-# subnet
+# public subnet
 resource "aws_subnet" "public" {
     count = length(var.subnet_public)
 
@@ -50,7 +50,7 @@ resource "aws_subnet" "public" {
     )
 }
 
-# routing table
+# public routing table
 resource "aws_route_table" "public" {
     count = length(var.azs) 
 
@@ -70,8 +70,7 @@ resource "aws_route_table" "public" {
     )
 }
 
-# route table association
-
+# public route table association
 resource "aws_route_table_association" "public" {
     count = length(var.azs)
 
@@ -79,9 +78,23 @@ resource "aws_route_table_association" "public" {
     route_table_id = aws_route_table.public.*.id[count.index]
 }
 
-# security group
+# public security group
 resource "aws_security_group" "public" {
     vpc_id = local.vpc_id
+
+    ingress {
+        from_port = var.port_http
+        to_port = var.port_http
+        protocol="tcp"
+        cidr_blocks = var.internal_cidrs
+    }
+
+    ingress {
+        from_port = var.port_ssh
+        to_port = var.port_ssh
+        protocol="tcp"
+        cidr_blocks = var.internal_cidrs
+    }
 
     egress {
         from_port = 0
@@ -99,91 +112,171 @@ resource "aws_security_group" "public" {
     )
 }
 
-resource "aws_security_group_rule" "public_http" {
-    security_group_id = aws_security_group.public.id
-    type = "ingress" 
-    from_port = var.port_http
-    to_port = var.port_http
-    protocol = "tcp" 
-    cidr_blocks = ["0.0.0.0/0"]
-}
+# private subnet 
+resource "aws_subnet" "private" {
+    count = length(var.subnet_private)
 
-resource "aws_security_group_rule" "public_ssh" {
-    security_group_id = aws_security_group.public.id
-    type = "ingress" 
-    from_port = var.port_ssh
-    to_port = var.port_ssh
-    protocol = "tcp" 
-    cidr_blocks = ["0.0.0.0/0"]
-}
-
-#service role
-resource "aws_iam_role" "ec2_deploy_role" {
-    name = "ec2_deploy_role"
-
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "ec2_deploy_policy" {
-    name = "ec2_deploy_policy" 
-    role = aws_iam_role.ec2_deploy_role.id
-
-    policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "s3:*",
-                "codedeploy:*"
-            ], 
-            "Effect": "Allow",
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_instance_profile" "ec2_deploy_profile" {
-    name = "deploy_profile"
-    role = aws_iam_role.ec2_deploy_role.name
-}
-
-#ec2 web
-resource "aws_instance" "web" {
-    count = length(var.azs)
-
-    ami = var.ec2_ami_web
-    instance_type = var.ec2_type_web
-    key_name = var.key_pair
-
-    subnet_id = aws_subnet.public.*.id[count.index]
-    vpc_security_group_ids = [
-        aws_security_group.public.id
-    ]
-
-    iam_instance_profile = aws_iam_instance_profile.ec2_deploy_profile.name
+    vpc_id = local.vpc_id
+    availability_zone = var.azs[count.index]
+    cidr_block = var.subnet_private[count.index]
 
     tags = merge(
         {
-            "Name" = format("%s-web-%s", var.name, var.azs[count.index])
+            "Name" = format("%s-private-%s", var.name, var.azs[count.index])
         },
         var.tags, 
         var.vpc_tags,
     )
 }
+
+# eip for NAT gateway
+resource "aws_eip" "nat_eip" {
+    count = length(var.azs)
+
+    vpc = true
+}
+
+# NAT gateway
+resource "aws_nat_gateway" "this" {
+    count = length(var.azs)
+
+    allocation_id = aws_eip.nat_eip.*.id[count.index]
+    subnet_id = aws_subnet.public.*.id[count.index]
+
+    tags = merge(
+        {
+            "Name" = format("%s-%s", var.name, var.azs[count.index])
+        },
+        var.tags, 
+        var.vpc_tags,
+    )
+}
+
+# private routing table 
+resource "aws_route_table" "private" {
+    count = length(var.azs)
+
+    vpc_id = local.vpc_id
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        nat_gateway_id = aws_nat_gateway.this.*.id[count.index]
+    }
+
+    tags = merge(
+        {
+            "Name" = format("%s-private-%s", var.name, var.azs[count.index])
+        },
+        var.tags, 
+        var.vpc_tags,
+    )
+}
+
+# private route table association
+resource "aws_route_table_association" "private" {
+    count = length(var.azs)
+
+    subnet_id = aws_subnet.private.*.id[count.index]
+    route_table_id = aws_route_table.private.*.id[count.index]
+}
+
+resource "aws_security_group" "private" {
+    vpc_id = local.vpc_id
+
+    ingress {
+        description = "http"
+        from_port = var.port_was
+        to_port = var.port_was
+        protocol = "tcp" 
+
+        security_groups = [
+            aws_security_group.public.id
+        ]
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = -1
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    tags = merge(
+        {
+            "Name" = format("%s-private", var.name)
+        },
+        var.tags, 
+        var.vpc_tags,
+    )
+}
+
+#service role
+#resource "aws_iam_role" "ec2_deploy_role" {
+#    name = "ec2_deploy_role"
+#
+#    assume_role_policy = <<EOF
+#{
+#  "Version": "2012-10-17",
+#  "Statement": [
+#    {
+#      "Action": "sts:AssumeRole",
+#      "Principal": {
+#        "Service": "ec2.amazonaws.com"
+#      },
+#      "Effect": "Allow",
+#      "Sid": ""
+#    }
+#  ]
+#}
+#EOF
+#}
+#
+#resource "aws_iam_role_policy" "ec2_deploy_policy" {
+#    name = "ec2_deploy_policy" 
+#    role = aws_iam_role.ec2_deploy_role.id
+#
+#    policy = <<EOF
+#{
+#    "Version": "2012-10-17",
+#    "Statement": [
+#        {
+#            "Action": [
+#                "s3:*",
+#                "codedeploy:*"
+#            ], 
+#            "Effect": "Allow",
+#            "Resource": "*"
+#        }
+#    ]
+#}
+#EOF
+#}
+#
+#resource "aws_iam_instance_profile" "ec2_deploy_profile" {
+#    name = "deploy_profile"
+#    role = aws_iam_role.ec2_deploy_role.name
+#}
+#
+##ec2 web
+#resource "aws_instance" "web" {
+#    count = length(var.azs)
+#
+#    ami = var.ec2_ami_web
+#    instance_type = var.ec2_type_web
+#    key_name = var.key_pair
+#
+#    subnet_id = aws_subnet.public.*.id[count.index]
+#    vpc_security_group_ids = [
+#        aws_security_group.public.id
+#    ]
+#
+#    iam_instance_profile = aws_iam_instance_profile.ec2_deploy_profile.name
+#
+#    tags = merge(
+#        {
+#            "Name" = format("%s-web-%s", var.name, var.azs[count.index])
+#        },
+#        var.tags, 
+#        var.vpc_tags,
+#    )
+#}
