@@ -73,12 +73,6 @@ variable "ec2_type_web" {
   default = "t2.micro"
 }
 
-variable "internal_cidrs" {
-  description = "allowed cidrs to connect"
-  type = list(string)
-  default = ["0.0.0.0/0"]
-}
-
 variable "vpc_tags" {
   description = "Additional tags for the VPC"
   type        = map(string)

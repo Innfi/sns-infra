@@ -86,14 +86,7 @@ resource "aws_security_group" "public" {
         from_port = var.port_http
         to_port = var.port_http
         protocol="tcp"
-        cidr_blocks = var.internal_cidrs
-    }
-
-    ingress {
-        from_port = var.port_ssh
-        to_port = var.port_ssh
-        protocol="tcp"
-        cidr_blocks = var.internal_cidrs
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     egress {

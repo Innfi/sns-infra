@@ -62,3 +62,9 @@ variable "vpc_tags" {
         Environment = "dev"
     }
 }
+
+variable "internal_cidrs" {
+  description = "allowed cidrs to connect"
+  type = list(string)
+  default = ["0.0.0.0/0"]
+}
