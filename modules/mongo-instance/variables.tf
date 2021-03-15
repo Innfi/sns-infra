@@ -11,6 +11,11 @@ variable "name" {
   default     = ""
 }
 
+variable "vpc_id" {
+  description = "vpc id"
+  type = string
+}
+
 variable "ec2_ami_mongodb" {
   description = "aws ami id"
   type = string
@@ -36,6 +41,12 @@ variable "subnets_db" {
 variable "security_group_db" {
     description = "security group for db"
     type = string
+}
+
+variable "mongodb_port" {
+  description = "mongodb port"
+  type = number 
+  default = 27017
 }
 
 variable "vpc_tags" {

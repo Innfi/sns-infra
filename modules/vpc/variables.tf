@@ -16,6 +16,11 @@ variable "cidr" {
   type        = string
 }
 
+variable "internal_cidrs" {
+  description = "allowed cidrs to connect"
+  type = list(string)
+}
+
 variable "subnet_public" {
   description = "public subnet cidrs"
   type = list

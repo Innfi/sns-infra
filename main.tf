@@ -16,6 +16,7 @@ module "vpc" {
     key_pair = var.key_pair
     port_http = var.port_http
     port_was = var.port_was
+    internal_cidrs = var.internal_cidrs
 
     tags = var.vpc_tags
 }
@@ -25,6 +26,7 @@ module "mongo-instance" {
 
     azs = var.vpc_azs
     name = var.vpc_name 
+    vpc_id = module.vpc.vpc_id
     subnets_db = module.vpc.subnet_id_private
     security_group_db = module.vpc.sg_id_private
     key_pair = var.key_pair
@@ -40,6 +42,7 @@ module "bastion" {
     vpc_id = module.vpc.vpc_id
     subnets_bastion = module.vpc.subnet_id_public 
     security_group_public = module.vpc.sg_id_public
+    security_group_private = module.vpc.sg_id_private
     key_pair = var.key_pair
     internal_cidrs = var.internal_cidrs
 

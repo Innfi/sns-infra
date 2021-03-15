@@ -86,7 +86,7 @@ resource "aws_security_group" "public" {
         from_port = var.port_http
         to_port = var.port_http
         protocol="tcp"
-        cidr_blocks = ["0.0.0.0/0"]
+        cidr_blocks = var.internal_cidrs
     }
 
     egress {
@@ -173,6 +173,7 @@ resource "aws_route_table_association" "private" {
     route_table_id = aws_route_table.private.*.id[count.index]
 }
 
+# private security group
 resource "aws_security_group" "private" {
     vpc_id = local.vpc_id
 

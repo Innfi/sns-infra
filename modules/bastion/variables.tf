@@ -39,7 +39,12 @@ variable "subnets_bastion" {
 }
 
 variable "security_group_public" {
-    description = "security group for bastion instances"
+    description = "public security group for bastion instances"
+    type = string
+}
+
+variable "security_group_private" {
+    description = "private security group for bastion instances"
     type = string
 }
 
