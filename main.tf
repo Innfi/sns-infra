@@ -49,28 +49,28 @@ module "bastion" {
     tags = var.vpc_tags
 }
 
-data "template_file" "ansible_inventory" {
-    template = "${file(path.module/inventory.template)}"
-    depends_on = [
-        module.mongo-instance
-        module.bastion
-    ]
+#data "template_file" "ansible_inventory" {
+#    template = "${file("./inventory.template")}"
+#    depends_on = [
+#        module.mongo-instance,
+#        module.bastion
+#    ]
+#
+#    vars = {
+#        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
+#        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
+#    }
+#}
 
-    vars {
-        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
-        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
-    }
-}
-
-resource "null_resource" "inventories" {
-    triggers {
-
-    } 
-
-    provisioner "local-exec" {
-
-    }
-}
+#resource "null_resource" "inventories" {
+#    triggers {
+#
+#    } 
+#
+#    provisioner "local-exec" {
+#
+#    }
+#}
 
 #module "codedeploy-ec2" {
 #    source = "./modules/codedeploy-ec2"

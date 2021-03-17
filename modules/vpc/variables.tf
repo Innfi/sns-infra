@@ -39,13 +39,13 @@ variable "key_pair" {
 variable "port_http" {
   description = "port number for web(http) instances"
   type = number 
-  default = 80
+  default = 1330
 }
 
 variable "port_https" {
   description = "port number for web(https) instances"
   type = number 
-  default = 443
+  default = 1331
 }
 
 variable "port_was" {

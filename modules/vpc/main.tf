@@ -82,20 +82,6 @@ resource "aws_route_table_association" "public" {
 resource "aws_security_group" "public" {
     vpc_id = local.vpc_id
 
-    ingress {
-        from_port = var.port_http
-        to_port = var.port_http
-        protocol="tcp"
-        cidr_blocks = var.internal_cidrs
-    }
-
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = -1
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
     tags = merge(
         {
             "Name" = format("%s-public", var.name)
@@ -103,6 +89,26 @@ resource "aws_security_group" "public" {
         var.tags, 
         var.vpc_tags,
     )
+}
+
+resource "aws_security_group_rule" "ingress_public" {
+    security_group_id = aws_security_group.public.id
+
+    type = "ingress" 
+    from_port = var.port_http
+    to_port = var.port_http
+    protocol = "tcp"
+    cidr_blocks = var.internal_cidrs
+}
+
+resource "aws_security_group_rule" "egress_public" {
+    security_group_id = aws_security_group.public.id
+
+    type = "egress" 
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
 }
 
 # private subnet 
@@ -177,24 +183,6 @@ resource "aws_route_table_association" "private" {
 resource "aws_security_group" "private" {
     vpc_id = local.vpc_id
 
-    ingress {
-        description = "http"
-        from_port = var.port_was
-        to_port = var.port_was
-        protocol = "tcp" 
-
-        security_groups = [
-            aws_security_group.public.id
-        ]
-    }
-
-    egress {
-        from_port = 0
-        to_port = 0
-        protocol = -1
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
     tags = merge(
         {
             "Name" = format("%s-private", var.name)
@@ -202,6 +190,26 @@ resource "aws_security_group" "private" {
         var.tags, 
         var.vpc_tags,
     )
+}
+
+resource "aws_security_group_rule" "ingress_private" {
+    security_group_id = aws_security_group.private.id
+
+    type = "ingress" 
+    from_port = var.port_was
+    to_port = var.port_was
+    protocol = "tcp"
+    source_security_group_id = aws_security_group.public.id
+}
+
+resource "aws_security_group_rule" "egress_private" {
+    security_group_id = aws_security_group.private.id
+
+    type = "egress" 
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
 }
 
 #service role
