@@ -1,0 +1,5 @@
+[bastion]
+${bastion_dns}
+
+[instance-mongodb]
+${mongodb_ips}

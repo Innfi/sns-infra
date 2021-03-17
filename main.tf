@@ -49,28 +49,29 @@ module "bastion" {
     tags = var.vpc_tags
 }
 
-#data "template_file" "ansible_inventory" {
-#    template = "${file("./inventory.template")}"
-#    depends_on = [
-#        module.mongo-instance,
-#        module.bastion
-#    ]
-#
-#    vars = {
-#        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
-#        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
-#    }
-#}
+data "template_file" "ansible_inventory" {
+    template = "${file("ansible-mongodb/install-mongodb/files/inventory.template")}"
+    depends_on = [
+        module.mongo-instance,
+        module.bastion
+    ]
 
-#resource "null_resource" "inventories" {
-#    triggers {
-#
-#    } 
-#
-#    provisioner "local-exec" {
-#
-#    }
-#}
+    vars = {
+        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
+        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
+    }
+}
+
+resource "null_resource" "inventories" {
+    triggers = {
+        template_rendered = "${data.template_file.ansible_inventory.rendered}"
+    } 
+
+    provisioner "local-exec" {
+        command = "echo '${data.template_file.ansible_inventory.rendered}' > ansible-mongodb/hosts"
+        interpreter = ["sh", "-c"]
+    }
+}
 
 #module "codedeploy-ec2" {
 #    source = "./modules/codedeploy-ec2"
