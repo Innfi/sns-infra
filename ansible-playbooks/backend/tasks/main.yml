@@ -1,0 +1,5 @@
+--- 
+# tasks file for backend
+
+- include_tasks: nginx.yml
+- include_tasks: node.yml

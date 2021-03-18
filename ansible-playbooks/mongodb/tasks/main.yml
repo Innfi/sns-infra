@@ -1,5 +1,5 @@
 --- 
-# tasks file for install-mongodb
+# tasks file for mongodb
 
 - name: cleanup default 
   apt: 

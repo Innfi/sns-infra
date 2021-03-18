@@ -49,8 +49,16 @@ module "bastion" {
     tags = var.vpc_tags
 }
 
+#module "codedeploy-ec2" {
+#    source = "./modules/codedeploy-ec2"
+#    name = var.vpc_name
+#
+#
+#    tags = var.vpc_tags
+#}
+
 data "template_file" "ansible_inventory" {
-    template = "${file("ansible-mongodb/install-mongodb/files/inventory.template")}"
+    template = "${file("ansible-playbooks/install-mongodb/files/inventory.template")}"
     depends_on = [
         module.mongo-instance,
         module.bastion
@@ -68,15 +76,7 @@ resource "null_resource" "inventories" {
     } 
 
     provisioner "local-exec" {
-        command = "echo '${data.template_file.ansible_inventory.rendered}' > ansible-mongodb/hosts"
+        command = "echo '${data.template_file.ansible_inventory.rendered}' > ansible-playbooks/hosts"
         interpreter = ["sh", "-c"]
     }
 }
-
-#module "codedeploy-ec2" {
-#    source = "./modules/codedeploy-ec2"
-#    name = var.vpc_name
-#
-#
-#    tags = var.vpc_tags
-#}
