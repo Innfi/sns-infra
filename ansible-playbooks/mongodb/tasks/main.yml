@@ -9,6 +9,8 @@
 - name: install mongodb 
   apt:
     name: mongodb
+    state: latest
+    update_cache: yes
 
 - name: create data directory
   file:
@@ -18,6 +20,6 @@
     group: '{{ username }}'
 
 - name: start mongod service 
-  system: 
-    name: mongod
+  systemd: 
+    name: mongodb
     state: started

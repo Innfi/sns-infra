@@ -1,8 +1,9 @@
 # Terraform configuration
 
 provider "aws" {
-    version = "~> 2.0"
     region = "ap-northeast-2"
+    shared_credentials_file = var.provider_cred_path
+    profile = var.profile
 }
 
 module "vpc" {
@@ -22,13 +23,25 @@ module "vpc" {
 }
 
 module "mongo-instance" {
-    source =  "./modules/mongo-instance"
+    source = "./modules/mongo-instance"
 
     azs = var.vpc_azs
     name = var.vpc_name 
     vpc_id = module.vpc.vpc_id
     subnets_db = module.vpc.subnet_id_private
     security_group_db = module.vpc.sg_id_private
+    key_pair = var.key_pair
+
+    tags = var.vpc_tags
+}
+
+module "frontend" {
+    source = "./modules/frontend" 
+
+    azs = var.vpc_azs 
+    name = var.vpc_name 
+    subnets_public = module.vpc.subnet_id_public
+    security_group_public = module.vpc.sg_id_public
     key_pair = var.key_pair
 
     tags = var.vpc_tags
@@ -58,7 +71,7 @@ module "bastion" {
 #}
 
 data "template_file" "ansible_inventory" {
-    template = "${file("ansible-playbooks/install-mongodb/files/inventory.template")}"
+    template = "${file(var.ansible_inven_template)}"
     depends_on = [
         module.mongo-instance,
         module.bastion

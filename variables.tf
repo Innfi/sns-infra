@@ -1,5 +1,17 @@
 # Input variable definitions 
 
+variable "provider_cred_path" {
+    description = "Shared credential path"
+    type = string
+    default = "~/.aws/credentials"
+}
+
+variable "profile" {
+    description = "AWS profile"
+    type = string
+    default = "default"
+}
+
 variable "vpc_name" {
     description = "Name of VPC"
     type = string 
@@ -67,4 +79,10 @@ variable "internal_cidrs" {
   description = "allowed cidrs to connect"
   type = list(string)
   default = ["0.0.0.0/0"]
+}
+
+variable "ansible_inven_template" {
+    description = "ansible inventory template"
+    type = string 
+    default = "ansible-playbooks/mongodb/files/inventory.template"
 }
