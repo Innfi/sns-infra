@@ -47,6 +47,18 @@ module "frontend" {
     tags = var.vpc_tags
 }
 
+module "backend" {
+    source = "./modules/backend"
+
+    azs = var.vpc_azs
+    name = var.vpc_name 
+    subnets_private = module.vpc.subnet_id_private
+    security_group_private = module.vpc.sg_id_private
+    key_pair = var.key_pair
+
+    tags = var.vpc_tags
+}
+
 module "bastion" {
     source = "./modules/bastion"
 
