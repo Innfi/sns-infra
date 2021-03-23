@@ -212,73 +212,21 @@ resource "aws_security_group_rule" "egress_private" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
-#service role
-#resource "aws_iam_role" "ec2_deploy_role" {
-#    name = "ec2_deploy_role"
-#
-#    assume_role_policy = <<EOF
-#{
-#  "Version": "2012-10-17",
-#  "Statement": [
-#    {
-#      "Action": "sts:AssumeRole",
-#      "Principal": {
-#        "Service": "ec2.amazonaws.com"
-#      },
-#      "Effect": "Allow",
-#      "Sid": ""
-#    }
-#  ]
-#}
-#EOF
-#}
-#
-#resource "aws_iam_role_policy" "ec2_deploy_policy" {
-#    name = "ec2_deploy_policy" 
-#    role = aws_iam_role.ec2_deploy_role.id
-#
-#    policy = <<EOF
-#{
-#    "Version": "2012-10-17",
-#    "Statement": [
-#        {
-#            "Action": [
-#                "s3:*",
-#                "codedeploy:*"
-#            ], 
-#            "Effect": "Allow",
-#            "Resource": "*"
-#        }
-#    ]
-#}
-#EOF
-#}
-#
-#resource "aws_iam_instance_profile" "ec2_deploy_profile" {
-#    name = "deploy_profile"
-#    role = aws_iam_role.ec2_deploy_role.name
-#}
-#
-##ec2 web
-#resource "aws_instance" "web" {
-#    count = length(var.azs)
-#
-#    ami = var.ec2_ami_web
-#    instance_type = var.ec2_type_web
-#    key_name = var.key_pair
-#
-#    subnet_id = aws_subnet.public.*.id[count.index]
-#    vpc_security_group_ids = [
-#        aws_security_group.public.id
-#    ]
-#
-#    iam_instance_profile = aws_iam_instance_profile.ec2_deploy_profile.name
-#
-#    tags = merge(
-#        {
-#            "Name" = format("%s-web-%s", var.name, var.azs[count.index])
-#        },
-#        var.tags, 
-#        var.vpc_tags,
-#    )
-#}
+# IAM role to access s3 
+resource "aws_iam_role" "s3_role" {
+    name = "ec2_general_role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole"
+        "Effect": "Allow",
+        "Sid": "",
+        "Principal": {
+          "Service" : "ec2.amazonaws.com"
+        },
+      }
+    ]
+  })
+}

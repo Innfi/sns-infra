@@ -1,4 +1,4 @@
-# Input variable definitions 
+# Input variable definitions
 
 variable "name" {
   description = "Name to be used on all the resources as identifier"
@@ -17,4 +17,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-
