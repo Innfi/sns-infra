@@ -21,19 +21,19 @@ module "vpc" {
 
     tags = var.vpc_tags
 }
-
-module "mongo-instance" {
-    source = "./modules/mongo-instance"
-
-    azs = var.vpc_azs
-    name = var.vpc_name 
-    vpc_id = module.vpc.vpc_id
-    subnets_db = module.vpc.subnet_id_private
-    security_group_db = module.vpc.sg_id_private
-    key_pair = var.key_pair
-
-    tags = var.vpc_tags
-}
+#
+#module "mongo-instance" {
+#    source = "./modules/mongo-instance"
+#
+#    azs = var.vpc_azs
+#    name = var.vpc_name 
+#    vpc_id = module.vpc.vpc_id
+#    subnets_db = module.vpc.subnet_id_private
+#    security_group_db = module.vpc.sg_id_private
+#    key_pair = var.key_pair
+#
+#    tags = var.vpc_tags
+#}
 
 module "frontend" {
     source = "./modules/frontend" 
@@ -47,61 +47,61 @@ module "frontend" {
     tags = var.vpc_tags
 }
 
-module "backend" {
-    source = "./modules/backend"
-
-    azs = var.vpc_azs
-    name = var.vpc_name 
-    subnets_private = module.vpc.subnet_id_private
-    security_group_private = module.vpc.sg_id_private
-    key_pair = var.key_pair
-
-    tags = var.vpc_tags
-}
-
-module "bastion" {
-    source = "./modules/bastion"
-
-    azs = var.vpc_azs
-    name = var.vpc_name 
-    vpc_id = module.vpc.vpc_id
-    subnets_bastion = module.vpc.subnet_id_public 
-    security_group_public = module.vpc.sg_id_public
-    security_group_private = module.vpc.sg_id_private
-    key_pair = var.key_pair
-    internal_cidrs = var.internal_cidrs
-
-    tags = var.vpc_tags
-}
-
-#module "codedeploy-ec2" {
-#    source = "./modules/codedeploy-ec2"
-#    name = var.vpc_name
+#module "backend" {
+#    source = "./modules/backend"
 #
+#    azs = var.vpc_azs
+#    name = var.vpc_name 
+#    subnets_private = module.vpc.subnet_id_private
+#    security_group_private = module.vpc.sg_id_private
+#    key_pair = var.key_pair
 #
 #    tags = var.vpc_tags
 #}
 
-data "template_file" "ansible_inventory" {
-    template = "${file(var.ansible_inven_template)}"
-    depends_on = [
-        module.mongo-instance,
-        module.bastion
-    ]
+#module "bastion" {
+#    source = "./modules/bastion"
+#
+#    azs = var.vpc_azs
+#    name = var.vpc_name 
+#    vpc_id = module.vpc.vpc_id
+#    subnets_bastion = module.vpc.subnet_id_public 
+#    security_group_public = module.vpc.sg_id_public
+#    security_group_private = module.vpc.sg_id_private
+#    key_pair = var.key_pair
+#    internal_cidrs = var.internal_cidrs
+#
+#    tags = var.vpc_tags
+#}
 
-    vars = {
-        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
-        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
-    }
-}
+#data "template_file" "ansible_inventory" {
+#    template = "${file(var.ansible_inven_template)}"
+#    depends_on = [
+#        module.mongo-instance,
+#        module.bastion
+#    ]
+#
+#    vars = {
+#        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
+#        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
+#    }
+#}
 
-resource "null_resource" "inventories" {
-    triggers = {
-        template_rendered = "${data.template_file.ansible_inventory.rendered}"
-    } 
+#resource "null_resource" "inventories" {
+#    triggers = {
+#        template_rendered = "${data.template_file.ansible_inventory.rendered}"
+#    } 
+#
+#    provisioner "local-exec" {
+#        command = "echo '${data.template_file.ansible_inventory.rendered}' > ansible-playbooks/hosts"
+#        interpreter = ["sh", "-c"]
+#    }
+#}
 
-    provisioner "local-exec" {
-        command = "echo '${data.template_file.ansible_inventory.rendered}' > ansible-playbooks/hosts"
-        interpreter = ["sh", "-c"]
-    }
+module "codepipeline-frontend" {
+    source = "./modules/codepipeline-frontend"
+
+    name = var.vpc_name 
+
+    tags = var.vpc_tags
 }
