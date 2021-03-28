@@ -1,6 +1,7 @@
 # S3 bucker for artifacts
-resource "aws_s3_bucket" "sns-v1" {
-    bucket = "sns-v1"
+
+resource "aws_s3_bucket" "sns-v2" {
+    bucket = "sns-v2"
     acl = "private"
 
     tags = merge(
@@ -27,7 +28,8 @@ resource "aws_iam_role" "codepipeline_role" {
         "Service" : [
           "codebuild.amazonaws.com",
           "codedeploy.amazonaws.com", 
-          "codepipeline.amazonaws.com"
+          "codepipeline.amazonaws.com",
+          "codestar.amazonaws.com"
         ]
       },
       "Action": "sts:AssumeRole"
@@ -51,15 +53,16 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
         ],
         "Effect": "Allow",
         "Resource": [
-          "${aws_s3_bucket.sns-v1.arn}",
-          "${aws_s3_bucket.sns-v1.arn}/*"
+          "${aws_s3_bucket.sns-v2.arn}",
+          "${aws_s3_bucket.sns-v2.arn}/*"
         ]
       },
       {
         "Action": [
           "codebuild:*",
           "codedeploy:*",
-          "codepipeline:*"
+          "codepipeline:*",
+          "codestar:*"
         ],
         "Effect": "Allow",
         "Resource": "*"
@@ -67,54 +70,6 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
   ]
 }
 EOF
-}
-
-#codepipeline 
-resource "aws_codepipeline" "codepipeline_frontend" {
-  name = "codepipeline-frontend"
-  role_arn = aws_iam_role.codepipeline_role.arn
-
-  artifact_store {
-    location = aws_s3_bucket.sns-v1.bucket
-    type = "S3"
-  }
-
-  stage {
-    name = "Source"
-    
-    action {
-      name = "Source" 
-      category = "Source" 
-      owner = "ThirdParty"
-      provider = "GitHub" 
-      version = "1" 
-      output_artifacts = ["source_output"]
-
-      configuration = {
-        Owner = "innfi"
-        Repo = "https://github.com/innfi/snd-frontend"
-        Branch = "main"
-        OAuthToken = "f1c80ab81b9238bfe345f88e53d5e31690f8389d"
-      }
-    }
-  }
-
-  stage {
-    name =  "Build"
-    action {
-      name = "Build" 
-      category = "Build"
-      owner = "AWS" 
-      provider = "Codebuild"
-      input_artifacts = ["source_output"] 
-      output_artifacts = ["build_output"]
-      version = "1"
-
-      configuration = {
-        ProjectName = aws_codebuild_project.codebuild_frontend.name
-      }
-    }
-  }
 }
 
 resource "aws_codebuild_project" "codebuild_frontend" {
@@ -133,11 +88,58 @@ resource "aws_codebuild_project" "codebuild_frontend" {
 
   cache {
     type = "S3"
-    location = "${aws_s3_bucket.sns-v1.bucket}/cache"
+    location = "${aws_s3_bucket.sns-v2.bucket}/cache"
   }
 
   source { 
     type = "CODEPIPELINE" 
     buildspec = "buildspec.yml"
+  }
+}
+
+#codepipeline 
+resource "aws_codepipeline" "codepipeline_frontend" {
+  name = "codepipeline-frontend"
+  role_arn = aws_iam_role.codepipeline_role.arn
+
+  artifact_store {
+    location = aws_s3_bucket.sns-v2.id
+    type = "S3"
+  }
+
+  stage {
+    name = "Source"
+    
+    action {
+      name = "Source" 
+      category = "Source" 
+      owner = "AWS"
+      provider = "CodeStarSourceConnection" 
+      version = "1" 
+      output_artifacts = ["source_output"]
+
+      configuration = {
+        ConnectionArn = var.codestar_arn
+        FullRepositoryId = "https://github.com/innfi/snd-frontend"
+        BranchName = "main"
+      }
+    }
+  }
+
+  stage {
+    name =  "Build"
+    action {
+      name = "Build" 
+      category = "Build"
+      owner = "AWS" 
+      provider = "CodeBuild"
+      input_artifacts = ["source_output"] 
+      output_artifacts = ["build_output"]
+      version = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.codebuild_frontend.name
+      }
+    }
   }
 }

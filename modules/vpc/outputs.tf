@@ -15,12 +15,12 @@ output "sg_id_public" {
     value = aws_security_group.public.id
 }
 
-output "subnet_id_private" {
-    description = "private subnet ids"
-    value = aws_subnet.private.*.id
-}
-
-output "sg_id_private" {
-    description = "private security group id"
-    value = aws_security_group.private.id
-}
+#output "subnet_id_private" {
+#    description = "private subnet ids"
+#    value = aws_subnet.private.*.id
+#}
+#
+#output "sg_id_private" {
+#    description = "private security group id"
+#    value = aws_security_group.private.id
+#}

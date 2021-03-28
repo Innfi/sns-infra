@@ -51,7 +51,7 @@ variable "vpc_private_subnets" {
 variable "key_pair" {
     description = "ec2 key pair"
     type = string
-    default = "InnfisKey"
+    default = "innfiskey-west1"
 }
 
 variable "port_http" {
@@ -78,7 +78,7 @@ variable "vpc_tags" {
 variable "internal_cidrs" {
   description = "allowed cidrs to connect"
   type = list(string)
-  default = ["124.5.226.230/32"]
+  default = ["0.0.0.0/0"]
 }
 
 variable "ansible_inven_template" {

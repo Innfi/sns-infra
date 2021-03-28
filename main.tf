@@ -6,21 +6,21 @@ provider "aws" {
     profile = var.profile
 }
 
-module "vpc" {
-    source = "./modules/vpc"
-
-    azs = var.vpc_azs
-    name = var.vpc_name
-    cidr = var.vpc_cidr
-    subnet_public = var.vpc_public_subnets
-    subnet_private = var.vpc_private_subnets
-    key_pair = var.key_pair
-    port_http = var.port_http
-    port_was = var.port_was
-    internal_cidrs = var.internal_cidrs
-
-    tags = var.vpc_tags
-}
+#module "vpc" {
+#    source = "./modules/vpc"
+#
+#    azs = var.vpc_azs
+#    name = var.vpc_name
+#    cidr = var.vpc_cidr
+#    subnet_public = var.vpc_public_subnets
+#    subnet_private = var.vpc_private_subnets
+#    key_pair = var.key_pair
+#    port_http = var.port_http
+#    port_was = var.port_was
+#    internal_cidrs = var.internal_cidrs
+#
+#    tags = var.vpc_tags
+#}
 #
 #module "mongo-instance" {
 #    source = "./modules/mongo-instance"
@@ -35,17 +35,17 @@ module "vpc" {
 #    tags = var.vpc_tags
 #}
 
-module "frontend" {
-    source = "./modules/frontend" 
+#module "frontend" {
+    #source = "./modules/frontend" 
 
-    azs = var.vpc_azs 
-    name = var.vpc_name 
-    subnets_public = module.vpc.subnet_id_public
-    security_group_public = module.vpc.sg_id_public
-    key_pair = var.key_pair
+    #azs = var.vpc_azs 
+    #name = var.vpc_name 
+    #subnets_public = module.vpc.subnet_id_public
+    #security_group_public = module.vpc.sg_id_public
+    #key_pair = var.key_pair
 
-    tags = var.vpc_tags
-}
+    #tags = var.vpc_tags
+#}
 
 #module "backend" {
 #    source = "./modules/backend"
@@ -98,10 +98,13 @@ module "frontend" {
 #    }
 #}
 
+resource "aws_codestarconnections_connection" "test-connection" {
+}
+
 module "codepipeline-frontend" {
     source = "./modules/codepipeline-frontend"
 
     name = var.vpc_name 
-
     tags = var.vpc_tags
+    codestar_arn = aws_codestarconnections_connection.test-connection.arn
 }
