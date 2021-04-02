@@ -98,13 +98,9 @@ provider "aws" {
 #    }
 #}
 
-resource "aws_codestarconnections_connection" "test-connection" {
-}
-
 module "codepipeline-frontend" {
     source = "./modules/codepipeline-frontend"
 
     name = var.vpc_name 
     tags = var.vpc_tags
-    codestar_arn = aws_codestarconnections_connection.test-connection.arn
 }

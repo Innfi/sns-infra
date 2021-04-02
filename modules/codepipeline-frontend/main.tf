@@ -62,7 +62,8 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
           "codebuild:*",
           "codedeploy:*",
           "codepipeline:*",
-          "codestar:*"
+          "codestar:*",
+          "codestar-connections:*"
         ],
         "Effect": "Allow",
         "Resource": "*"
@@ -70,6 +71,11 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
   ]
 }
 EOF
+}
+
+resource "aws_codestarconnections_connection" "connection_github" {
+  name = "connection_github" 
+  provider_type = "GitHub"
 }
 
 resource "aws_codebuild_project" "codebuild_frontend" {
@@ -119,7 +125,7 @@ resource "aws_codepipeline" "codepipeline_frontend" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn = var.codestar_arn
+        ConnectionArn = aws_codestarconnections_connection.connection_github.arn
         FullRepositoryId = "https://github.com/innfi/snd-frontend"
         BranchName = "main"
       }

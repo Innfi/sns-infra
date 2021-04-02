@@ -17,8 +17,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-
-variable "codestar_arn" {
-  description = "codestart arn for github"
-  type = string 
-}
