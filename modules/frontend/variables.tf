@@ -49,3 +49,8 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "rolename" {
+  description = "role name for frontend instances"
+  type = string
+}

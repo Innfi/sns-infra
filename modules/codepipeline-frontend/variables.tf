@@ -6,6 +6,11 @@ variable "name" {
   default     = ""
 }
 
+variable "rolename" {
+  description = "Role nameof frontend instances for Codedeploy DG"
+  type = string 
+}
+
 variable "vpc_tags" {
   description = "Additional tags for the VPC"
   type        = map(string)

@@ -51,7 +51,7 @@ variable "vpc_private_subnets" {
 variable "key_pair" {
     description = "ec2 key pair"
     type = string
-    default = "innfiskey-west1"
+    default = "InnfisKey"
 }
 
 variable "port_http" {
@@ -85,4 +85,10 @@ variable "ansible_inven_template" {
     description = "ansible inventory template"
     type = string 
     default = "ansible-playbooks/mongodb/files/inventory.template"
+}
+
+variable "rolename_frontend" {
+    description = "role name for frontend instances" 
+    type = string 
+    default = "role_frontend"
 }

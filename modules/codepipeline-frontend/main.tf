@@ -63,7 +63,7 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
               "codepipeline:*",
               "codestar:*",
               "codestar-connections:*",
-              "logs:"
+              "logs:*"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -72,11 +72,13 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
     })
 }
 
+#Codestar connections for github
 resource "aws_codestarconnections_connection" "connection_github" {
   name = "connection_github2"
   provider_type = "GitHub"
 }
 
+#Codebuild project
 resource "aws_codebuild_project" "codebuild_frontend" {
   name = "codebuild_frontend"
   service_role = aws_iam_role.codepipeline_role.arn
@@ -102,7 +104,32 @@ resource "aws_codebuild_project" "codebuild_frontend" {
   }
 }
 
-#codepipeline 
+#Codedeploy
+resource "aws_codedeploy_app" "codedeploy_frontend" {
+  compute_platform = "Server"
+  name = "codedeploy-frontend"
+}
+
+resource "aws_codedeploy_deployment_group" "dg_frontend" {
+  app_name = aws_codedeploy_app.codedeploy_frontend.name
+  deployment_group_name = "dg-frontend"
+  service_role_arn = aws_iam_role.codepipeline_role.arn
+
+  ec2_tag_set {
+    ec2_tag_filter {
+      type = "KEY_AND_VALUE"
+      key = "Name" 
+      value = var.rolename
+    }
+  } 
+
+  auto_rollback_configuration {
+    enabled = true
+    events = ["DEPLOYMENT_FAILURE"]
+  }
+}
+
+#Codepipeline 
 resource "aws_codepipeline" "codepipeline_frontend" {
   name = "codepipeline-frontend"
   role_arn = aws_iam_role.codepipeline_role.arn
@@ -132,7 +159,8 @@ resource "aws_codepipeline" "codepipeline_frontend" {
   }
 
   stage {
-    name =  "Build"
+    name = "Build"
+
     action {
       name = "Build" 
       category = "Build"
@@ -147,4 +175,21 @@ resource "aws_codepipeline" "codepipeline_frontend" {
       }
     }
   }
+
+#  stage {
+#    name = "Deploy"
+#
+#    action {
+#      name = "Deploy" 
+#      category = "Deploy"
+#      owner = "AWS" 
+#      provider = "CodeDeploy"
+#      input_artifacts = ["build_output"]
+#      version = "1"
+#
+#      configuration = {
+#        
+#      }
+#    }
+#  }
 }

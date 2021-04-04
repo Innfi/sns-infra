@@ -21,7 +21,7 @@ provider "aws" {
 #
 #    tags = var.vpc_tags
 #}
-#
+
 #module "mongo-instance" {
 #    source = "./modules/mongo-instance"
 #
@@ -36,15 +36,16 @@ provider "aws" {
 #}
 
 #module "frontend" {
-    #source = "./modules/frontend" 
-
-    #azs = var.vpc_azs 
-    #name = var.vpc_name 
-    #subnets_public = module.vpc.subnet_id_public
-    #security_group_public = module.vpc.sg_id_public
-    #key_pair = var.key_pair
-
-    #tags = var.vpc_tags
+#   source = "./modules/frontend" 
+#
+#   azs = var.vpc_azs 
+#   name = var.vpc_name 
+#   subnets_public = module.vpc.subnet_id_public
+#   security_group_public = module.vpc.sg_id_public
+#   key_pair = var.key_pair
+#
+#   tags = var.vpc_tags
+#   rolename = var.rolename_frontend
 #}
 
 #module "backend" {
@@ -100,6 +101,8 @@ provider "aws" {
 
 module "codepipeline-frontend" {
     source = "./modules/codepipeline-frontend"
+
+    rolename = var.rolename_frontend
 
     name = var.vpc_name 
     tags = var.vpc_tags

@@ -13,7 +13,8 @@ resource "aws_instance" "frontend" {
 
     tags = merge (
         {
-            "Name" = format("%s-frontend-%s", var.name, var.azs[count.index])
+            "Name" = format("%s-frontend-%s", var.name, var.azs[count.index]),
+            "Role" = var.rolename
         },
         var.tags, 
         var.vpc_tags
