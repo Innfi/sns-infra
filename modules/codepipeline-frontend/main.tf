@@ -176,20 +176,21 @@ resource "aws_codepipeline" "codepipeline_frontend" {
     }
   }
 
-#  stage {
-#    name = "Deploy"
-#
-#    action {
-#      name = "Deploy" 
-#      category = "Deploy"
-#      owner = "AWS" 
-#      provider = "CodeDeploy"
-#      input_artifacts = ["build_output"]
-#      version = "1"
-#
-#      configuration = {
-#        
-#      }
-#    }
-#  }
+  stage {
+    name = "Deploy"
+
+    action {
+      name = "Deploy" 
+      category = "Deploy"
+      owner = "AWS" 
+      provider = "CodeDeploy"
+      input_artifacts = ["build_output"]
+      version = "1"
+
+      configuration = {
+        ApplicationName = aws_codedeploy_app.codedeploy_frontend.name,
+        DeploymentGroupName = aws_codedeploy_deployment_group.dg_frontend.deployment_group_name
+      }
+    }
+  }
 }
