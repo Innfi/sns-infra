@@ -99,11 +99,21 @@ provider "aws" {
 #    }
 #}
 
+module "cicd-baseline" {
+    source = "./modules/cicd-baseline" 
+
+    name = var.vpc_name 
+    tags = var.vpc_tags
+}
+
 module "codepipeline-frontend" {
     source = "./modules/codepipeline-frontend"
 
     rolename = var.rolename_frontend
-
+    s3_sns_bucket = module.cicd-baseline.s3_sns_bucket
+    s3_sns_id = module.cicd-baseline.s3_sns_id
+    codepipeline_role_arn = module.cicd-baseline.codepipeline_role_arn
+    codestarconnection_arn = module.cicd-baseline.codestarconnection_arn
     name = var.vpc_name 
     tags = var.vpc_tags
 }

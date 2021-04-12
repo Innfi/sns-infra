@@ -7,8 +7,28 @@ variable "name" {
 }
 
 variable "rolename" {
-  description = "Role nameof frontend instances for Codedeploy DG"
+  description = "Role name of frontend instances for Codedeploy DG"
   type = string 
+}
+
+variable "s3_sns_bucket" {
+  description = "s3 bucket for codepipeline"
+  type = string 
+}
+
+variable "s3_sns_id" {
+  description = "s3 id for codepipeline"
+  type = string
+}
+
+variable "codepipeline_role_arn" {
+  description = "iam role arn for codepipeline"
+  type = string 
+}
+
+variable "codestarconnection_arn" {
+  description = "codestarconnection arn for codepipeline"
+  type = string
 }
 
 variable "vpc_tags" {

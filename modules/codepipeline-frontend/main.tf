@@ -1,87 +1,8 @@
-# S3 bucker for artifacts
-
-resource "aws_s3_bucket" "sns-v2" {
-    bucket = "sns-v2"
-    acl = "private"
-
-    tags = merge(
-        {
-            "Name" = format("%s-public", var.name)
-        },
-        var.tags, 
-        var.vpc_tags,
-    )
-}
-
-# IAM service for for codepipeline
-resource "aws_iam_role" "codepipeline_role" {
-  name = "codepipeline_role"
-
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "",
-        "Effect": "Allow",
-        "Principal": {
-          "Service" : [
-            "cloudwatch.amazonaws.com",
-            "events.amazonaws.com",
-            "codebuild.amazonaws.com",
-            "codedeploy.amazonaws.com", 
-            "codepipeline.amazonaws.com",
-            "codestar.amazonaws.com"
-          ]
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "codepipeline_role_policy" {
-    name = "codepipeline_role_policy"
-    role = aws_iam_role.codepipeline_role.id
-
-    policy = jsonencode({
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-            "Action": [
-              "s3:*"
-            ],
-            "Effect": "Allow",
-            "Resource": [
-              aws_s3_bucket.sns-v2.arn,
-              "${aws_s3_bucket.sns-v2.arn}/*"
-            ]
-          },
-          {
-            "Action": [
-              "codebuild:*",
-              "codedeploy:*",
-              "codepipeline:*",
-              "codestar:*",
-              "codestar-connections:*",
-              "logs:*"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-          }
-      ]
-    })
-}
-
-#Codestar connections for github
-resource "aws_codestarconnections_connection" "connection_github" {
-  name = "connection_github2"
-  provider_type = "GitHub"
-}
 
 #Codebuild project
 resource "aws_codebuild_project" "codebuild_frontend" {
   name = "codebuild_frontend"
-  service_role = aws_iam_role.codepipeline_role.arn
+  service_role = var.codepipeline_role_arn
   artifacts {
     type = "CODEPIPELINE"
   } 
@@ -95,7 +16,7 @@ resource "aws_codebuild_project" "codebuild_frontend" {
 
   cache {
     type = "S3"
-    location = "${aws_s3_bucket.sns-v2.bucket}/cache"
+    location = "${var.s3_sns_bucket}/cache"
   }
 
   source { 
@@ -113,7 +34,7 @@ resource "aws_codedeploy_app" "codedeploy_frontend" {
 resource "aws_codedeploy_deployment_group" "dg_frontend" {
   app_name = aws_codedeploy_app.codedeploy_frontend.name
   deployment_group_name = "dg-frontend"
-  service_role_arn = aws_iam_role.codepipeline_role.arn
+  service_role_arn = var.codepipeline_role_arn
 
   ec2_tag_set {
     ec2_tag_filter {
@@ -132,10 +53,10 @@ resource "aws_codedeploy_deployment_group" "dg_frontend" {
 #Codepipeline 
 resource "aws_codepipeline" "codepipeline_frontend" {
   name = "codepipeline-frontend"
-  role_arn = aws_iam_role.codepipeline_role.arn
+  role_arn = var.codepipeline_role_arn
 
   artifact_store {
-    location = aws_s3_bucket.sns-v2.id
+    location = var.s3_sns_id
     type = "S3"
   }
 
@@ -151,7 +72,7 @@ resource "aws_codepipeline" "codepipeline_frontend" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn = aws_codestarconnections_connection.connection_github.arn
+        ConnectionArn = var.codestarconnection_arn
         FullRepositoryId = "Innfi/sns-frontend"
         BranchName = "main"
       }
