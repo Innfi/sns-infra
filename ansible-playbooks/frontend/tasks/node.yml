@@ -1,0 +1,27 @@
+---
+#tasks file for node 
+
+- name: download node
+  get_url:
+    url: https://deb.nodesource.com/setup_12.x
+    dest: /tmp/setup_12.x
+    mode: 0755
+    force: no
+  register: setup_downloaded
+
+- name: node repo
+  command: /tmp/setup_12.x
+  when: setup_downloaded | changed
+
+- name: install node
+  apt:
+    name: nodejs
+    state: latest
+
+- name: create web directory
+  file:
+    path: /var/www
+    state: directory
+    owner: '{{username}}'
+    group: '{{username}}'
+
