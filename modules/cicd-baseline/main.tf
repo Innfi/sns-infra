@@ -30,7 +30,8 @@ resource "aws_iam_role" "codepipeline_role" {
             "codebuild.amazonaws.com",
             "codedeploy.amazonaws.com", 
             "codepipeline.amazonaws.com",
-            "codestar.amazonaws.com"
+            "codestar.amazonaws.com",
+            "ec2.amazonaws.com"
           ]
         },
         "Action": "sts:AssumeRole"
@@ -63,7 +64,8 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
               "codepipeline:*",
               "codestar:*",
               "codestar-connections:*",
-              "logs:*"
+              "logs:*",
+              "ec2:*"
             ],
             "Effect": "Allow",
             "Resource": "*"

@@ -39,7 +39,7 @@ resource "aws_codedeploy_deployment_group" "dg_frontend" {
   ec2_tag_set {
     ec2_tag_filter {
       type = "KEY_AND_VALUE"
-      key = "Name" 
+      key = "Role" 
       value = var.rolename
     }
   } 

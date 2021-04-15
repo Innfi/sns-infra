@@ -6,21 +6,21 @@ provider "aws" {
     profile = var.profile
 }
 
-module "vpc" {
-    source = "./modules/vpc"
-
-    azs = var.vpc_azs
-    name = var.vpc_name
-    cidr = var.vpc_cidr
-    subnet_public = var.vpc_public_subnets
-    subnet_private = var.vpc_private_subnets
-    key_pair = var.key_pair
-    port_http = var.port_http
-    port_was = var.port_was
-    internal_cidrs = var.internal_cidrs
-
-    tags = var.vpc_tags
-}
+#module "vpc" {
+#    source = "./modules/vpc"
+#
+#    azs = var.vpc_azs
+#    name = var.vpc_name
+#    cidr = var.vpc_cidr
+#    subnet_public = var.vpc_public_subnets
+#    subnet_private = var.vpc_private_subnets
+#    key_pair = var.key_pair
+#    port_http = var.port_http
+#    port_was = var.port_was
+#    internal_cidrs = var.internal_cidrs
+#
+#    tags = var.vpc_tags
+#}
 
 #module "mongo-instance" {
 #    source = "./modules/mongo-instance"
@@ -117,15 +117,15 @@ module "codepipeline-frontend" {
     name = var.vpc_name 
     tags = var.vpc_tags
 }
-
-module "codepipeline-backend" {
-    source = "./modules/codepipeline-backend"
-
-    rolename = var.rolename_frontend
-    s3_sns_bucket = module.cicd-baseline.s3_sns_bucket
-    s3_sns_id = module.cicd-baseline.s3_sns_id
-    codepipeline_role_arn = module.cicd-baseline.codepipeline_role_arn
-    codestarconnection_arn = module.cicd-baseline.codestarconnection_arn
-    name = var.vpc_name 
-    tags = var.vpc_tags
-}
+#
+#module "codepipeline-backend" {
+#    source = "./modules/codepipeline-backend"
+#
+#    rolename = var.rolename_frontend
+#    s3_sns_bucket = module.cicd-baseline.s3_sns_bucket
+#    s3_sns_id = module.cicd-baseline.s3_sns_id
+#    codepipeline_role_arn = module.cicd-baseline.codepipeline_role_arn
+#    codestarconnection_arn = module.cicd-baseline.codestarconnection_arn
+#    name = var.vpc_name 
+#    tags = var.vpc_tags
+#}
