@@ -2,4 +2,6 @@
 ${bastion_dns}
 
 [instance-mongodb]
-${mongodb_ips}
+
+[instance-frontend]
+${frontend_ips}

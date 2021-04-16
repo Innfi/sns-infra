@@ -84,7 +84,7 @@ variable "internal_cidrs" {
 variable "ansible_inven_template" {
     description = "ansible inventory template"
     type = string 
-    default = "ansible-playbooks/mongodb/files/inventory.template"
+    default = "ansible-playbooks/inventory.template"
 }
 
 variable "rolename_frontend" {

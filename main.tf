@@ -6,21 +6,21 @@ provider "aws" {
     profile = var.profile
 }
 
-#module "vpc" {
-#    source = "./modules/vpc"
-#
-#    azs = var.vpc_azs
-#    name = var.vpc_name
-#    cidr = var.vpc_cidr
-#    subnet_public = var.vpc_public_subnets
-#    subnet_private = var.vpc_private_subnets
-#    key_pair = var.key_pair
-#    port_http = var.port_http
-#    port_was = var.port_was
-#    internal_cidrs = var.internal_cidrs
-#
-#    tags = var.vpc_tags
-#}
+module "vpc" {
+    source = "./modules/vpc"
+
+    azs = var.vpc_azs
+    name = var.vpc_name
+    cidr = var.vpc_cidr
+    subnet_public = var.vpc_public_subnets
+    subnet_private = var.vpc_private_subnets
+    key_pair = var.key_pair
+    port_http = var.port_http
+    port_was = var.port_was
+    internal_cidrs = var.internal_cidrs
+
+    tags = var.vpc_tags
+}
 
 #module "mongo-instance" {
 #    source = "./modules/mongo-instance"
@@ -74,23 +74,25 @@ provider "aws" {
 #
 #    tags = var.vpc_tags
 #}
-
+#
 #data "template_file" "ansible_inventory" {
-#    template = "${file(var.ansible_inven_template)}"
+#    template = file(var.ansible_inven_template)
 #    depends_on = [
-#        module.mongo-instance,
-#        module.bastion
+#        module.bastion,
+#        module.frontend
+#        #module.mongo-instance,
 #    ]
 #
 #    vars = {
-#        mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
-#        bastion_dns = "${join("\n", module.bastion.bastion_public_dns)}"
+#        bastion_dns = join("\n", module.bastion.bastion_public_dns)
+#        frontend_ips = join("\n", module.frontend.frontend_private_ips)
+#        #mongodb_ips = "${join("\n", module.mongo-instance.mongodb_private_ips)}"
 #    }
 #}
-
+#
 #resource "null_resource" "inventories" {
 #    triggers = {
-#        template_rendered = "${data.template_file.ansible_inventory.rendered}"
+#        template_rendered = data.template_file.ansible_inventory.rendered
 #    } 
 #
 #    provisioner "local-exec" {
