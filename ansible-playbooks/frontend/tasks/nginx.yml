@@ -3,7 +3,7 @@
 
 - name: install nginx
   apt:
-    state:present
+    state: present
   with_items:
     - httpd
     - nginx

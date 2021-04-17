@@ -1,2 +1,5 @@
 --- 
 # tasks file for frontend
+
+- include_tasks: nginx.yml
+- include_tasks: node.yml

@@ -78,7 +78,7 @@ variable "vpc_tags" {
 variable "internal_cidrs" {
   description = "allowed cidrs to connect"
   type = list(string)
-  default = ["0.0.0.0/0"]
+  default = ["124.5.226.230/32"]
 }
 
 variable "ansible_inven_template" {
