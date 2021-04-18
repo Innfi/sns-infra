@@ -24,3 +24,8 @@ output "sg_id_private" {
     description = "private security group id"
     value = aws_security_group.private.id
 }
+
+output "general_instance_profile_name" {
+    description = "instance profile name for ec2 instances"
+    value = aws_iam_instance_profile.general_instance_profile.name
+}

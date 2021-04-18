@@ -230,3 +230,30 @@ resource "aws_iam_role" "s3_role" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "s3_role_policy" {
+    name = "s3_role_policy"
+    role = aws_iam_role.s3_role.id
+
+    policy = jsonencode({
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:Get*",
+              "s3:List*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::sns-v2/*",
+                "arn:aws:s3:::aws-codedeploy-ap-northeast-2/*"
+            ]
+          }
+      ]
+    })
+}
+
+resource "aws_iam_instance_profile" "general_instance_profile" {
+    name = "general_instance_profile" 
+    role = aws_iam_role.s3_role.name
+}

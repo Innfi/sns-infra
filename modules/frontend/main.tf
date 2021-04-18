@@ -11,6 +11,8 @@ resource "aws_instance" "frontend" {
         var.security_group_public
     ]
 
+    iam_instance_profile = var.general_instance_profile_name
+
     tags = merge (
         {
             "Name" = format("%s-frontend-%s", var.name, var.azs[count.index]),

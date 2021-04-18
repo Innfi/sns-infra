@@ -46,6 +46,7 @@ module "frontend" {
 
    tags = var.vpc_tags
    rolename = var.rolename_frontend
+   general_instance_profile_name = module.vpc.general_instance_profile_name
 }
 
 #module "backend" {
