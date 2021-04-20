@@ -1,0 +1,21 @@
+--- 
+# tasks file for codedeploy-agent
+
+- name: install baseline
+  apt:
+    state: present
+    name: ruby-full
+
+- name: download agent installer
+  get_url:
+    url: https://aws-codedeploy-ap-northeast-2.s3.ap-northeast-2.amazonaws.com/latest/install
+    dest: /home/ubuntu
+    mode: +x
+
+- name: install agent
+  ansible.bulletin.shell: sudo /home/ubuntu/install auto > /tmp/logfile
+
+- name: ensure agent started
+  systemd:
+    name: codedeploy-agent 
+    state:started

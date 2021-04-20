@@ -54,3 +54,8 @@ variable "rolename" {
   description = "role name for frontend instances"
   type = string
 }
+
+variable "general_instance_profile_name" {
+  description = "instance profile name for ec2 instances" 
+  type = string
+}

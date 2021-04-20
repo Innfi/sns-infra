@@ -3,3 +3,4 @@
 
 - include_tasks: nginx.yml
 - include_tasks: node.yml
+- include_tasks: cd-agent.yml
