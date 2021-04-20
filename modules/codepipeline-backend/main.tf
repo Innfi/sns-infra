@@ -72,10 +72,45 @@ resource "aws_codepipeline" "codepipeline_backend" {
 
       configuration = {
         ConnectionArn = var.codestarconnection_arn
-        FullRepositoryId = "Innfi/sns-backend"
+        FullRepositoryId = var.repo_id
         BranchName = "main"
       }
     }
   }
 
+  stage {
+    name = "Build"
+
+    action {
+      name = "Build" 
+      category = "Build"
+      owner = "AWS" 
+      provider = "CodeBuild"
+      input_artifacts = ["source_output"] 
+      output_artifacts = ["build_output"]
+      version = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.codebuild_backend.name
+      }
+    }
+  }
+
+  stage {
+    name = "Deploy"
+
+    action {
+      name = "Deploy" 
+      category = "Deploy"
+      owner = "AWS" 
+      provider = "CodeDeploy"
+      input_artifacts = ["build_output"]
+      version = "1"
+
+      configuration = {
+        ApplicationName = aws_codedeploy_app.codedeploy_backend.name,
+        DeploymentGroupName = aws_codedeploy_deployment_group.dg_backend.deployment_group_name
+      }
+    }
+  }
 }

@@ -92,3 +92,21 @@ variable "rolename_frontend" {
     type = string 
     default = "role_frontend"
 }
+
+variable "rolename_backend" {
+    descriptino = "role name for backend instances" 
+    type = string 
+    default = "role_backend"
+}
+
+variable "repo_id_frontend" {
+  description = "repository id for frontend"
+  type = string
+  default = "Innfi/sns-frontend"
+}
+
+variable "repo_id_backend" {
+  description = "repository id for backend"
+  type = string
+  default = "Innfi/sns-backend"
+}

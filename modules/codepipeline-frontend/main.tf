@@ -73,7 +73,7 @@ resource "aws_codepipeline" "codepipeline_frontend" {
 
       configuration = {
         ConnectionArn = var.codestarconnection_arn
-        FullRepositoryId = "Innfi/sns-frontend"
+        FullRepositoryId = var.repo_id
         BranchName = "main"
       }
     }

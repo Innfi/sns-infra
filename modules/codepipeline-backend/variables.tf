@@ -31,6 +31,11 @@ variable "codestarconnection_arn" {
   type = string
 }
 
+variable "repo_id" {
+  description = "repository id for backend"
+  type = string
+}
+
 variable "vpc_tags" {
   description = "Additional tags for the VPC"
   type        = map(string)
