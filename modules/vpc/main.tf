@@ -128,89 +128,89 @@ resource "aws_subnet" "private" {
     )
 }
 
-# eip for NAT gateway
-resource "aws_eip" "nat_eip" {
-    count = length(var.azs)
-
-    vpc = true
-}
-
-# NAT gateway
-resource "aws_nat_gateway" "this" {
-    count = length(var.azs)
-
-    allocation_id = aws_eip.nat_eip.*.id[count.index]
-    subnet_id = aws_subnet.public.*.id[count.index]
-
-    tags = merge(
-        {
-            "Name" = format("%s-%s", var.name, var.azs[count.index])
-        },
-        var.tags, 
-        var.vpc_tags,
-    )
-}
-
-# private routing table 
-resource "aws_route_table" "private" {
-    count = length(var.azs)
-
-    vpc_id = local.vpc_id
-
-    route {
-        cidr_block = "0.0.0.0/0"
-        nat_gateway_id = aws_nat_gateway.this.*.id[count.index]
-    }
-
-    tags = merge(
-        {
-            "Name" = format("%s-private-%s", var.name, var.azs[count.index])
-        },
-        var.tags, 
-        var.vpc_tags,
-    )
-}
-
-# private route table association
-resource "aws_route_table_association" "private" {
-    count = length(var.azs)
-
-    subnet_id = aws_subnet.private.*.id[count.index]
-    route_table_id = aws_route_table.private.*.id[count.index]
-}
-
-# private security group
-resource "aws_security_group" "private" {
-    vpc_id = local.vpc_id
-
-    tags = merge(
-        {
-            "Name" = format("%s-private", var.name)
-        },
-        var.tags, 
-        var.vpc_tags,
-    )
-}
-
-resource "aws_security_group_rule" "ingress_private" {
-    security_group_id = aws_security_group.private.id
-
-    type = "ingress" 
-    from_port = var.port_was
-    to_port = var.port_was
-    protocol = "tcp"
-    source_security_group_id = aws_security_group.public.id
-}
-
-resource "aws_security_group_rule" "egress_private" {
-    security_group_id = aws_security_group.private.id
-
-    type = "egress" 
-    from_port = 0
-    to_port = 0
-    protocol = -1
-    cidr_blocks = ["0.0.0.0/0"]
-}
+## eip for NAT gateway
+#resource "aws_eip" "nat_eip" {
+#    count = length(var.azs)
+#
+#    vpc = true
+#}
+#
+## NAT gateway
+#resource "aws_nat_gateway" "this" {
+#    count = length(var.azs)
+#
+#    allocation_id = aws_eip.nat_eip.*.id[count.index]
+#    subnet_id = aws_subnet.public.*.id[count.index]
+#
+#    tags = merge(
+#        {
+#            "Name" = format("%s-%s", var.name, var.azs[count.index])
+#        },
+#        var.tags, 
+#        var.vpc_tags,
+#    )
+#}
+#
+## private routing table 
+#resource "aws_route_table" "private" {
+#    count = length(var.azs)
+#
+#    vpc_id = local.vpc_id
+#
+#    route {
+#        cidr_block = "0.0.0.0/0"
+#        nat_gateway_id = aws_nat_gateway.this.*.id[count.index]
+#    }
+#
+#    tags = merge(
+#        {
+#            "Name" = format("%s-private-%s", var.name, var.azs[count.index])
+#        },
+#        var.tags, 
+#        var.vpc_tags,
+#    )
+#}
+#
+## private route table association
+#resource "aws_route_table_association" "private" {
+#    count = length(var.azs)
+#
+#    subnet_id = aws_subnet.private.*.id[count.index]
+#    route_table_id = aws_route_table.private.*.id[count.index]
+#}
+#
+## private security group
+#resource "aws_security_group" "private" {
+#    vpc_id = local.vpc_id
+#
+#    tags = merge(
+#        {
+#            "Name" = format("%s-private", var.name)
+#        },
+#        var.tags, 
+#        var.vpc_tags,
+#    )
+#}
+#
+#resource "aws_security_group_rule" "ingress_private" {
+#    security_group_id = aws_security_group.private.id
+#
+#    type = "ingress" 
+#    from_port = var.port_was
+#    to_port = var.port_was
+#    protocol = "tcp"
+#    source_security_group_id = aws_security_group.public.id
+#}
+#
+#resource "aws_security_group_rule" "egress_private" {
+#    security_group_id = aws_security_group.private.id
+#
+#    type = "egress" 
+#    from_port = 0
+#    to_port = 0
+#    protocol = -1
+#    cidr_blocks = ["0.0.0.0/0"]
+#}
 
 # IAM role to access s3 
 resource "aws_iam_role" "s3_role" {

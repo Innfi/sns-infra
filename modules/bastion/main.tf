@@ -43,15 +43,15 @@ resource "aws_security_group_rule" "ingress_bastion_public" {
     source_security_group_id = aws_security_group.bastion.id
 }
 
-resource "aws_security_group_rule" "ingress_bastion_private" {
-    security_group_id = var.security_group_private 
-
-    type = "ingress"
-    from_port = var.bastion_ssh_port 
-    to_port = var.bastion_ssh_port 
-    protocol = "tcp" 
-    source_security_group_id = aws_security_group.bastion.id
-}
+#resource "aws_security_group_rule" "ingress_bastion_private" {
+#    security_group_id = var.security_group_private 
+#
+#    type = "ingress"
+#    from_port = var.bastion_ssh_port 
+#    to_port = var.bastion_ssh_port 
+#    protocol = "tcp" 
+#    source_security_group_id = aws_security_group.bastion.id
+#}
 
 # ec2 instance for bastion
 resource "aws_instance" "bastion" {

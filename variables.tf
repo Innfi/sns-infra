@@ -57,7 +57,7 @@ variable "key_pair" {
 variable "port_http" {
   description = "port number for web(http) instances"
   type = number 
-  default = 1330
+  default = 80
 }
 
 variable "port_was" {
@@ -78,7 +78,7 @@ variable "vpc_tags" {
 variable "internal_cidrs" {
   description = "allowed cidrs to connect"
   type = list(string)
-  default = ["124.5.226.230/32"]
+  default = ["0.0.0.0/0"]
 }
 
 variable "ansible_inven_template" {
@@ -94,7 +94,7 @@ variable "rolename_frontend" {
 }
 
 variable "rolename_backend" {
-    descriptino = "role name for backend instances" 
+    description = "role name for backend instances" 
     type = string 
     default = "role_backend"
 }

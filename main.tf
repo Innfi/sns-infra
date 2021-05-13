@@ -69,7 +69,7 @@ module "vpc" {
 #    vpc_id = module.vpc.vpc_id
 #    subnets_bastion = module.vpc.subnet_id_public 
 #    security_group_public = module.vpc.sg_id_public
-#    security_group_private = module.vpc.sg_id_private
+#    #security_group_private = module.vpc.sg_id_private
 #    key_pair = var.key_pair
 #    internal_cidrs = var.internal_cidrs
 #
@@ -122,15 +122,15 @@ module "codepipeline-frontend" {
     tags = var.vpc_tags
 }
 
-module "codepipeline-backend" {
-    source = "./modules/codepipeline-backend"
-
-    rolename = var.rolename_backend
-    s3_sns_bucket = module.cicd-baseline.s3_sns_bucket
-    s3_sns_id = module.cicd-baseline.s3_sns_id
-    codepipeline_role_arn = module.cicd-baseline.codepipeline_role_arn
-    codestarconnection_arn = module.cicd-baseline.codestarconnection_arn
-    repo_id = var.repo_id_backend
-    name = var.vpc_name 
-    tags = var.vpc_tags
-}
+#module "codepipeline-backend" {
+#    source = "./modules/codepipeline-backend"
+#
+#    rolename = var.rolename_backend
+#    s3_sns_bucket = module.cicd-baseline.s3_sns_bucket
+#    s3_sns_id = module.cicd-baseline.s3_sns_id
+#    codepipeline_role_arn = module.cicd-baseline.codepipeline_role_arn
+#    codestarconnection_arn = module.cicd-baseline.codestarconnection_arn
+#    repo_id = var.repo_id_backend
+#    name = var.vpc_name 
+#    tags = var.vpc_tags
+#}
