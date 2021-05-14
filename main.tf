@@ -72,6 +72,7 @@ module "vpc" {
 #    #security_group_private = module.vpc.sg_id_private
 #    key_pair = var.key_pair
 #    internal_cidrs = var.internal_cidrs
+#    ec2_ami_bastion = "ami-080d388232afa008d"
 #
 #    tags = var.vpc_tags
 #}

@@ -13,9 +13,10 @@
     mode: +x
 
 - name: install agent
-  ansible.bulletin.shell: sudo /home/ubuntu/install auto > /tmp/logfile
+  become: yes
+  shell: /home/ubuntu/install auto > /tmp/logfile
 
 - name: ensure agent started
   systemd:
     name: codedeploy-agent 
-    state:started
+    state: started
