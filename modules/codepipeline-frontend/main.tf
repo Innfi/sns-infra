@@ -115,3 +115,37 @@ resource "aws_codepipeline" "codepipeline_frontend" {
     }
   }
 }
+
+resource "aws_sns_topic" "noti_frontend" {
+  name = "noti_frontend"
+}
+
+data "aws_iam_policy_document" "noti_access_frontend" {
+  statement {
+    actions = ["sns:Publish"]
+
+    principals {
+      type = "Service"
+      identifiers = ["codestar-notifications.amazonaws.com"]
+    }
+
+    resources = [ aws_sns_topic.noti_frontend.arn ]
+  }
+}
+
+resource "aws_sns_topic_policy" "noti_policy_sns" {
+  arn = aws_sns_topic.noti_frontend.arn 
+  policy = data.aws_iam_policy_document.noti_access_frontend.json
+}
+
+resource "aws_codestarnotifications_notification_rule" "noti_frontend_startbuild" {
+  name = "noti_frontend_startbuild"
+
+  detail_type = "BASIC"
+  event_type_ids = ["codebuild-project-build-state-in-progress"]
+  resource = aws_codebuild_project.codebuild_frontend.arn 
+  target {
+    address = aws_sns_topic.noti_frontend.arn
+  }
+}
+
