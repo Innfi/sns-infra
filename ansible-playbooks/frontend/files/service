@@ -1,0 +1,13 @@
+server {
+    listen 1330;
+    listen [::]:1330;
+
+    server_name _;
+
+    root /var/www/html/sns-v1;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}

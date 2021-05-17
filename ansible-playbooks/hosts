@@ -4,4 +4,4 @@ ec2-52-79-58-204.ap-northeast-2.compute.amazonaws.com
 [instance-mongodb]
 
 [instance-frontend]
-10.0.1.122
+frontend
