@@ -6,11 +6,11 @@
     name: nginx
     state: present
 
-#- name: copy nginx config
-#  copy:
-#    src: files/https.config
-#    dest: /etc/nginx/sites-available
-#    mode: 0755
+- name: copy nginx config
+  copy:
+    src: files/service
+    dest: /etc/nginx/sites-available/sns-service
+    mode: 0755
 
 - name: start nginx
   systemd:

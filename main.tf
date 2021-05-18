@@ -76,7 +76,7 @@ module "vpc" {
 #
 #    tags = var.vpc_tags
 #}
-
+#
 #data "template_file" "ansible_inventory" {
 #    template = file(var.ansible_inven_template)
 #    depends_on = [
