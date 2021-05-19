@@ -1,9 +1,0 @@
----
-# tasks file for bastion baseline
-
-- name: add frontend instance to ssh hosts
-  community.general.ssh_config:
-    user: ubuntu
-    host: 10.0.0.1 #FIXME
-    identity_file: "~/.ssh/InnfisKey.pem"
-    state: present

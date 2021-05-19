@@ -31,7 +31,7 @@ resource "aws_codedeploy_app" "codedeploy_frontend" {
   name = "codedeploy-frontend"
 }
 
-resource "aws_codedeploy_deployment_group" "dg_frontend" {
+resource "aws_codedeploy_deployment_group" "dg_frontend2" {
   app_name = aws_codedeploy_app.codedeploy_frontend.name
   deployment_group_name = "dg-frontend"
   service_role_arn = var.codepipeline_role_arn
@@ -110,7 +110,7 @@ resource "aws_codepipeline" "codepipeline_frontend" {
 
       configuration = {
         ApplicationName = aws_codedeploy_app.codedeploy_frontend.name,
-        DeploymentGroupName = aws_codedeploy_deployment_group.dg_frontend.deployment_group_name
+        DeploymentGroupName = aws_codedeploy_deployment_group.dg_frontend2.deployment_group_name
       }
     }
   }
@@ -143,6 +143,28 @@ resource "aws_codestarnotifications_notification_rule" "noti_frontend_startbuild
 
   detail_type = "BASIC"
   event_type_ids = ["codebuild-project-build-state-in-progress"]
+  resource = aws_codebuild_project.codebuild_frontend.arn 
+  target {
+    address = aws_sns_topic.noti_frontend.arn
+  }
+}
+
+resource "aws_codestarnotifications_notification_rule" "noti_frontend_success" {
+  name = "noti_frontend_success"
+
+  detail_type = "BASIC"
+  event_type_ids = ["codedeploy-application-deployment-succeeded"]
+  resource = aws_codebuild_project.codebuild_frontend.arn 
+  target {
+    address = aws_sns_topic.noti_frontend.arn
+  }
+}
+
+resource "aws_codestarnotifications_notification_rule" "noti_frontend_faile" {
+  name = "noti_frontend_fail"
+
+  detail_type = "BASIC"
+  event_type_ids = ["codedeploy-application-deployment-failed"]
   resource = aws_codebuild_project.codebuild_frontend.arn 
   target {
     address = aws_sns_topic.noti_frontend.arn

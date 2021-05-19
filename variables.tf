@@ -57,7 +57,7 @@ variable "key_pair" {
 variable "port_http" {
   description = "port number for web(http) instances"
   type = number 
-  default = 80
+  default = 1330
 }
 
 variable "port_was" {
