@@ -40,6 +40,7 @@ module "vpc" {
 #
 #   azs = var.vpc_azs 
 #   name = var.vpc_name 
+#   vpc_id = module.vpc.vpc_id
 #   subnets_public = module.vpc.subnet_id_public
 #   security_group_public = module.vpc.sg_id_public
 #   key_pair = var.key_pair

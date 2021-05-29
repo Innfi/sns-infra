@@ -11,6 +11,11 @@ variable "name" {
   default     = ""
 }
 
+variable "vpc_id" {
+  description = "vpc id"
+  type = string
+}
+
 variable "ec2_ami_frontend" {
   description = "aws ami id"
   type = string
