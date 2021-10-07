@@ -73,7 +73,7 @@ resource "aws_codepipeline" "codepipeline_backend" {
       configuration = {
         ConnectionArn = var.codestarconnection_arn
         FullRepositoryId = var.repo_id
-        BranchName = "main"
+        BranchName = "master"
       }
     }
   }

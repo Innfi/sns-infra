@@ -19,3 +19,14 @@ resource "aws_instance" "backend" {
         var.vpc_tags
     )
 }
+
+resource "aws_s3_bucket" "media-bucket" {
+    bucket = var.media_bucket_name 
+    acl = var.media_bucket_acl
+
+    cors_rule {
+        allowed_headers = ["*"]
+        allowed_methods = ["PUT", "POST", "GET"]
+        allowed_origins = ["*"] #FIXME
+    }
+}

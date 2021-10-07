@@ -28,13 +28,25 @@ variable "key_pair" {
 }
 
 variable "subnets_private" {
-    description = "subnet ids for backend instances"
-    type = list(string)
+  description = "subnet ids for backend instances"
+  type = list(string)
 }
 
 variable "security_group_private" {
-    description = "private security group for backend instances"
-    type = string
+  description = "private security group for backend instances"
+  type = string
+}
+
+variable "media_bucket_name" {
+  description = "s3 bucket name for media storage"
+  type = string 
+  default = "innfis-media"
+}
+
+variable "media_bucket_acl" {
+  description = "s3 bucket ACL for media storage"
+  type = string
+  default = "public-read-write"
 }
 
 variable "vpc_tags" {
